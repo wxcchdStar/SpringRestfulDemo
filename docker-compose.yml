@@ -1,0 +1,47 @@
+version: '3'
+services:
+  spring-restful-demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spring-restful-demo
+    container_name: spring-restful-demo
+#    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE
+    depends_on:
+      - redis
+      - mysql
+    links:
+      - redis:demo-redis
+      - mysql:demo-mysql
+    volumes:
+      - ~/docker/spring-restful-demo/data:/data
+      - ~/docker/spring-restful-demo/upload:/app/upload
+  redis:
+    image: "redis:4.0.11-alpine"
+    container_name: "spring-restful-demo-redis"
+    restart: always
+    ports:
+      - "63793:6379"
+    volumes:
+      - ~/docker/spring-restful-demo/redis:/data
+    command:
+      - --requirepass 123456
+  mysql:
+    image: "mysql:5.7.21"
+    container_name: "spring-restful-demo-mysql"
+    restart: always
+    ports:
+      - "33063:3306"
+    volumes:
+      - ~/docker/spring-restful-demo/mysql:/var/lib/mysql
+      - ./config/mysql:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: apidemo
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: apidemo
+      TZ: Asia/Shanghai

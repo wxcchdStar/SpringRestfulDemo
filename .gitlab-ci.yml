@@ -1,0 +1,58 @@
+#variables:
+#  SONAR_URL: "https://sonar.xxx.com"
+#  SONAR_LOGIN: "123456"
+#
+#stages:
+#  - analysis
+#  - deploy
+#
+#sonarqube_preview:
+#  stage: analysis
+#  except:
+#    - develop
+#    - master
+#  script:
+#    - mvn -Dmaven.test.skip=true --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$(git log --pretty=format:%H origin/master..$CI_COMMIT_REF | tr '\n' ',') -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.unique_issue_per_inline=true
+#
+#sonarqube_publish:
+#  stage: analysis
+#  script:
+#    - mvn -Dmaven.test.skip=true --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN
+#  only:
+#    - develop
+#
+#deploy_debug:
+#  stage: deploy
+#  only:
+#    - develop
+#  tags:
+#    - debug
+#  script:
+#    - mvn install -Dmaven.test.skip=true   || true
+#    - mvn package -Dmaven.test.skip=true   || true
+#    - sudo docker stop spring-restful-demo || true
+#    - sudo docker rm spring-restful-demo   || true
+#    - sudo docker rmi spring-restful-demo  || true
+#    - sudo `which docker-compose` build
+#    - sudo `which docker-compose` run -d --service-ports -e SPRING_PROFILES_ACTIVE="test,swagger" --name spring-restful-demo spring-restful-demo
+#  environment:
+#    name: Debug
+#    url: http://testapi.xxx.com
+#
+#deploy_release:
+#  stage: deploy
+#  only:
+#    - master
+#  tags:
+#    - release
+#  script:
+#    - mvn install -Dmaven.test.skip=true   || true
+#    - mvn package -Dmaven.test.skip=true   || true
+#    - sudo docker stop spring-restful-demo || true
+#    - sudo docker rm spring-restful-demo   || true
+#    - sudo docker rmi spring-restful-demo  || true
+#    - sudo `which docker-compose` build
+#    - sudo `which docker-compose` run -d --service-ports -e SPRING_PROFILES_ACTIVE="prod" --name spring-restful-demo spring-restful-demo
+#  environment:
+#    name: Release
+#    url: http://api.xxx.com
